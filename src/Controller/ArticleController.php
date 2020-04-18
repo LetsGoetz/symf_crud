@@ -1,6 +1,8 @@
 <?php
 namespace App\Controller;
 
+use App\Entity\Article;
+
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -9,14 +11,52 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ArticleController extends AbstractController
 {
     /**
-     * @Route("/")
+     * @Route("/", name="article_list")
      * @Method({"GET"})
      */
     public function index()
     {
-        $articles = ['Article1', 'Article2'];
+        $articles = $this->getDoctrine()
+            ->getRepository(Article::class)
+            ->findAll();
         return $this->render('articles/index.html.twig', array(
             'articles' => $articles
         ));
     }
+
+    /**
+     * @Route("/article/{id}", name="article_show")
+     */
+    public function show($id)
+    {
+        $article = $this->getDoctrine()
+            ->getRepository(Article::class)
+            ->find($id);
+
+        return $this->render('articles/show.html.twig', array(
+            'article' => $article
+        ));
+    }
+
+    // # UNSAFE JUST FOR DISPLAY
+
+    // /**
+    //  * @route("/article/save")
+    //  */
+    // public function save()
+    // {
+    //     $entityManager = $this->getDoctrine()->getManager();
+
+    //     $article = new Article();
+    //     $article->setTitle('Article 2');
+    //     $article->setBody('This is some example text');
+
+    //     $entityManager->persist($article);
+
+    //     $entityManager->flush();
+
+    //     return new Response(
+    //         'Saved an Article with the Id of ' . $article->getId()
+    //     );
+    // }
 }
